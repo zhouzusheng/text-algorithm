@@ -6,11 +6,10 @@ import java.util.Set;
 import java.util.TreeSet;
 
 /**
- * 多个DFA 合并为一个DFA， 同时也保留单个的DFA
- * 原来的多个DFA 存储在基类中
+ * 多个DFA 合并为一个DFA
  * 总的DFA的根以 0 开始
  */
-public class DfaCompose extends DfaUnion {
+public class DfaCompose {
 
     public static interface HitCallback {
         void hit(int id, int start, int end);
@@ -19,6 +18,12 @@ public class DfaCompose extends DfaUnion {
     public static interface HitCallback2 {
         void hit(Object id, int start, int end);
     }
+
+    /**
+     * 多个dfa的并集， ids 保存每个dfa 的 id
+     */
+    private Object[] ids;
+
     /**
      * 所有单dfa 编译成的整体DFA的状态表
      * 第一维是所有的状态
@@ -34,6 +39,13 @@ public class DfaCompose extends DfaUnion {
      */
     private int[][] dfaAccepts;
 
+    public Object[] getIds() {
+        return ids;
+    }
+
+    public void setIds(Object[] ids) {
+        this.ids = ids;
+    }
 
     public int[][] getDfaTables() {
         return dfaTables;
@@ -174,15 +186,23 @@ public class DfaCompose extends DfaUnion {
         }
     }
 
-    void determinize() {
-        DeterminizeOperation op = new DeterminizeOperation(this);
+    void determinize(DfaUnion union) {
+        DeterminizeOperation op = new DeterminizeOperation(union,this);
         op.determinize();
     }
 
+    public SparseDfa toSparseDfa() {
+        SparseDfaOperation op = new SparseDfaOperation(this);
+        return op.sparse();
+    }
+
     public static DfaCompose compose(Dfa... dfas) {
+        DfaUnion union = new DfaUnion();
+        Dfa.union(union, dfas);
+
         DfaCompose compose = new DfaCompose();
-        Dfa.union(compose, dfas);
-        compose.determinize();
+
+        compose.determinize(union);
         return compose;
     }
 }

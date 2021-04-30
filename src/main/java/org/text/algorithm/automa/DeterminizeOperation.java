@@ -3,6 +3,7 @@ package org.text.algorithm.automa;
 import java.util.*;
 
 class DeterminizeOperation {
+    DfaUnion union;
     DfaCompose compose;
 
     List<Dfa.DfaState> states;
@@ -13,10 +14,12 @@ class DeterminizeOperation {
 
     Map<DeterminizeState, Dfa.DfaState> newStates;
 
-    public DeterminizeOperation(DfaCompose compose) {
+    public DeterminizeOperation(DfaUnion union, DfaCompose compose) {
+        this.union = union;
         this.compose = compose;
-        this.tables = compose.getTables();
-        this.accepts = compose.getAccepts();
+        this.compose.setIds(union.getIds());
+        this.tables = union.getTables();
+        this.accepts = union.getAccepts();
     }
 
     public void determinize() {
@@ -25,7 +28,7 @@ class DeterminizeOperation {
         this.newStates = new HashMap<>();
 
         TreeSet<Integer> initialset = new TreeSet<>();
-        int[] rootIds = compose.getRoots();
+        int[] rootIds = union.getRoots();
         for (int id : rootIds) {
             initialset.add(id);
         }
@@ -44,7 +47,7 @@ class DeterminizeOperation {
             if( i <  rootIds.length-1) {
                 maxId = rootIds[i+1];
             } else {
-                maxId = compose.getTables().length;
+                maxId = union.getTables().length;
             }
 
             for(int j = rootId; j < maxId; j++){

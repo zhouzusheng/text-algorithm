@@ -3,6 +3,7 @@ package org.text.algorithm;
 import org.junit.Test;
 import org.text.algorithm.automa.Dfa;
 import org.text.algorithm.automa.DfaCompose;
+import org.text.algorithm.automa.SparseDfa;
 import org.text.algorithm.automa.StringDfa;
 
 import java.util.ArrayList;
@@ -44,5 +45,8 @@ public class AutomaTest {
         DfaCompose compose = DfaCompose.compose(dfa1, dfa2);
         System.out.println(compose.matchIds("bbb", 0));
         System.out.println(compose.matchIds2("123", 0));
+
+        SparseDfa sparseDfa = compose.toSparseDfa();
+        System.out.println(sparseDfa.matchIds("123", 0));
     }
 }
